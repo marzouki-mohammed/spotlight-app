@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Clerk Authentication - Spotlight App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            color: #2563eb;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        pre {
+            background-color: #1e293b;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .note {
+            background-color: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guide d'intégration de Clerk dans une application Expo/React Native</h1>
+    
+    <div class="container">
+        <h2>Qu'est-ce que Clerk ?</h2>
+        <p>Clerk est une solution d'authentification complète qui offre :</p>
+        <ul>
+            <li>Authentification sociale (Google, Apple, etc.)</li>
+            <li>Gestion des utilisateurs</li>
+            <li>Sessions sécurisées</li>
+            <li>Protection contre la fraude</li>
+            <li>Personnalisation de l'interface</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>Configuration initiale</h2>
+        <h3>1. Installation des dépendances</h3>
+        <pre>npx expo install @clerk/clerk-expo expo-secure-store expo-web-browser</pre>
+        
+        <h3>2. Configuration des variables d'environnement</h3>
+        <p>Créez un fichier .env à la racine du projet :</p>
+        <pre>EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key</pre>
+    </div>
+
+    <div class="container">
+        <h2>Mise en place du TokenCache</h2>
+        <p>Le TokenCache permet de stocker les jetons d'authentification de manière sécurisée :</p>
+        <pre>
+import { TokenCache } from '@clerk/clerk-expo/dist/cache';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
+
+const createTokenCache = (): TokenCache => ({
+    getToken: async (key) => {
+        try {
+            return await SecureStore.getItemAsync(key);
+        } catch (err) {
+            return null;
+        }
+    },
+    saveToken: async (key, token) => {
+        try {
+            await SecureStore.setItemAsync(key, token);
+        } catch (err) {
+            return;
+        }
+    }
+});
+
+export const tokenCache = 
+    Platform.OS !== 'web' ? createTokenCache() : undefined;</pre>
+    </div>
+
+    <div class="container">
+        <h2>Configuration du ClerkProvider</h2>
+        <p>Dans votre _layout.tsx principal :</p>
+        <pre>
+import { ClerkProvider } from '@clerk/clerk-expo';
+import { tokenCache } from './path/to/cache';
+
+export default function RootLayout() {
+  return (
+    &lt;ClerkProvider 
+      tokenCache={tokenCache}
+      publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
+    &gt;
+      {/* Your app content */}
+    &lt;/ClerkProvider&gt;
+  );
+}</pre>
+    </div>
+
+    <div class="container">
+        <h2>Implémentation de l'authentification Google</h2>
+        <pre>
+import { useOAuth } from "@clerk/clerk-expo";
+import * as WebBrowser from "expo-web-browser";
+
+WebBrowser.maybeCompleteAuthSession();
+
+const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
+
+const onSignInWithGoogle = async () => {
+  try {
+    const { createdSessionId, setActive } = await startOAuthFlow();
+    if (createdSessionId) {
+      setActive!({ session: createdSessionId });
+      // Redirection après connexion
+    }
+  } catch (err) {
+    console.error("OAuth error:", err);
+  }
+};</pre>
+    </div>
+
+    <div class="note">
+        <h3>Points importants :</h3>
+        <ul>
+            <li>Configurez votre projet sur le dashboard Clerk</li>
+            <li>Ajoutez les URLs de redirection OAuth appropriées</li>
+            <li>Gérez correctement les erreurs d'authentification</li>
+            <li>Implémentez la déconnexion et la gestion des sessions</li>
+        </ul>
+    </div>
+</body>
+</html>

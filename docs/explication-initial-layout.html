@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explication - InitialLauyot.tsx</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8fafc; color: #222; margin: 0; padding: 0 0 40px 0; }
+    .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 32px 24px; }
+    h1, h2 { color: #2563eb; }
+    code, pre { background: #f1f5f9; border-radius: 4px; padding: 2px 6px; font-size: 15px; }
+    pre { display: block; padding: 16px; margin: 16px 0; overflow-x: auto; }
+    ul { margin-top: 0; }
+    .section { margin-bottom: 32px; }
+    .file { color: #16a34a; font-weight: bold; }
+    .note { background: #e0f2fe; border-left: 4px solid #2563eb; padding: 12px 18px; margin: 24px 0; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Explication du composant <span class="file">InitialLauyot.tsx</span></h1>
+
+    <div class="section">
+      <h2>But du composant</h2>
+      <p>
+        Ce composant protège les routes de l'application en fonction de l'état d'authentification de l'utilisateur. Il redirige automatiquement l'utilisateur vers la page de connexion ou la page principale selon son statut.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Explication du code principal</h2>
+      <pre><code>{`const {isLoaded , isSignedIn}=useAuth();
+const segments = useSegments();
+const rout = useRouter();
+useEffect(()=>{
+  if(!isLoaded) return;
+  const inAuthScreen = segments[0] === "(auth)";
+
+  if(!isSignedIn && !inAuthScreen) rout.replace("/(auth)/login")
+  else if(isSignedIn && inAuthScreen) rout.replace("/(tabs)")
+
+},[isLoaded , isSignedIn , segments])
+
+if(!isLoaded) return null
+
+return <Stack screenOptions={{headerShown : false}} />`}</code></pre>
+      <ul>
+        <li><b>useAuth()</b> : Récupère l'état de chargement et de connexion de l'utilisateur via Clerk.</li>
+        <li><b>useSegments()</b> : Permet de savoir sur quelle section de l'app on se trouve (auth, tabs, etc.).</li>
+        <li><b>useRouter()</b> : Pour naviguer entre les pages.</li>
+        <li><b>useEffect</b> :
+          <ul>
+            <li>Attend que Clerk ait fini de charger (<code>isLoaded</code>).</li>
+            <li>Si l'utilisateur <b>n'est pas connecté</b> et <b>n'est pas sur une page d'auth</b>, il est redirigé vers la page de login.</li>
+            <li>Si l'utilisateur <b>est connecté</b> et <b>est sur une page d'auth</b>, il est redirigé vers la page principale (<code>/(tabs)</code>).</li>
+          </ul>
+        </li>
+        <li><b>if(!isLoaded) return null</b> : Ne rend rien tant que Clerk n'a pas fini de charger.</li>
+        <li><b>return &lt;Stack ... /&gt;</b> : Affiche la navigation principale de l'application sans header.</li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <b>Résumé :</b> Ce composant garantit que seuls les utilisateurs connectés accèdent à l'app principale, et que les non-connectés restent sur les pages d'authentification. Il centralise la logique de redirection automatique selon l'état de connexion.
+    </div>
+  </div>
+</body>
+</html>

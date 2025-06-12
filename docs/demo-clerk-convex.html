@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Démo Clerk + Convex & Guide d'intégration</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8fafc; color: #222; margin: 0; padding: 0 0 40px 0; }
+    .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 32px 24px; }
+    h1, h2 { color: #2563eb; }
+    code, pre { background: #f1f5f9; border-radius: 4px; padding: 2px 6px; font-size: 15px; }
+    pre { display: block; padding: 16px; margin: 16px 0; overflow-x: auto; }
+    ul { margin-top: 0; }
+    .section { margin-bottom: 32px; }
+    .file { color: #16a34a; font-weight: bold; }
+    .note { background: #e0f2fe; border-left: 4px solid #2563eb; padding: 12px 18px; margin: 24px 0; border-radius: 6px; }
+    .demo-box { background: #f1f5f9; border-radius: 8px; padding: 18px; margin: 18px 0; }
+    .step { margin-bottom: 12px; }
+    .step strong { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Démo Clerk + Convex</h1>
+    <div class="section">
+      <h2>Démo Fonctionnelle</h2>
+      <div class="demo-box">
+        <ul>
+          <li>Connexion sécurisée avec Clerk (Google OAuth)</li>
+          <li>Création automatique d'utilisateur dans Convex via Webhook</li>
+          <li>Navigation protégée (authentifié/non-authentifié)</li>
+          <li>Stockage des données utilisateur dans Convex</li>
+        </ul>
+        <img src="https://clerk.com/images/og-image.png" alt="Clerk Demo" style="max-width:300px;display:block;margin:20px auto;">
+        <img src="https://convex.dev/img/og-image.png" alt="Convex Demo" style="max-width:300px;display:block;margin:20px auto;">
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Étapes d'intégration Clerk + Convex</h2>
+      <ol>
+        <li class="step"><strong>Créer un projet Clerk</strong> sur <a href="https://dashboard.clerk.com/" target="_blank">dashboard.clerk.com</a> et activer Google OAuth.</li>
+        <li class="step"><strong>Créer un projet Convex</strong> sur <a href="https://dashboard.convex.dev/" target="_blank">dashboard.convex.dev</a>.</li>
+        <li class="step"><strong>Configurer les variables d'environnement</strong> dans <span class="file">.env.local</span> :
+<pre><code>EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+EXPO_PUBLIC_CONVEX_URL=https://votre-instance.convex.cloud
+CLERK_WEBHOOK_SECRET=whsec_...
+</code></pre></li>
+        <li class="step"><strong>Installer les dépendances</strong> :
+<pre><code>npx expo install @clerk/clerk-expo expo-secure-store expo-web-browser
+npm install convex svix</code></pre></li>
+        <li class="step"><strong>Mettre en place le provider global</strong> :
+<pre><code>{`// app/_layout.tsx
+import ClerkConvexProvider from '@/provieders/ClerkConvexProvieder';
+...
+<ClerkConvexProvider>
+  {/* ...app content... */}
+</ClerkConvexProvider>
+`}</code></pre></li>
+        <li class="step"><strong>Configurer le webhook Clerk</strong> pour pointer vers <span class="file">/clerkwebhook</span> de votre backend Convex.</li>
+        <li class="step"><strong>Créer la route Convex pour le webhook</strong> :
+<pre><code>{`// convex/http.ts
+http.route({
+  path: "/clerkwebhook",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    // ...vérification et création user...
+  })
+});`}</code></pre></li>
+        <li class="step"><strong>Créer la mutation Convex pour créer un utilisateur</strong> :
+<pre><code>{`// convex/users.ts
+import { mutation } from "convex/server";
+export const createUser = mutation(async ({ db }, { email, fullname, image, clerkId, username }) => {
+  await db.insert("users", { email, fullname, image, clerkId, username });
+});`}</code></pre></li>
+        <li class="step"><strong>Tester la connexion</strong> : Connectez-vous avec Google, vérifiez la création de l'utilisateur dans Convex.</li>
+      </ol>
+    </div>
+
+    <div class="section">
+      <h2>Ressources utiles</h2>
+      <ul>
+        <li><a href="https://clerk.com/docs" target="_blank">Documentation Clerk</a></li>
+        <li><a href="https://docs.convex.dev/" target="_blank">Documentation Convex</a></li>
+        <li><a href="https://github.com/clerkinc/clerk-expo-starter" target="_blank">Exemple Clerk Expo</a></li>
+        <li><a href="https://github.com/get-convex/convex-demos" target="_blank">Exemples Convex</a></li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <b>Astuce :</b> Pour le développement local, vérifiez bien les URLs de redirection OAuth et les secrets dans vos variables d'environnement.<br>
+      Pour la production, utilisez des URLs HTTPS et des secrets sécurisés.
+    </div>
+  </div>
+</body>
+</html>

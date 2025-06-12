@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explication des pages Spotlight App</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f8fafc;
+      color: #222;
+      margin: 0;
+      padding: 0 0 40px 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0001;
+      padding: 32px 24px;
+    }
+    h1, h2, h3 {
+      color: #2563eb;
+    }
+    code, pre {
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 15px;
+    }
+    pre {
+      display: block;
+      padding: 16px;
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+    .section {
+      margin-bottom: 32px;
+    }
+    .file {
+      color: #16a34a;
+      font-weight: bold;
+    }
+    ul {
+      margin-top: 0;
+    }
+    .note {
+      background: #e0f2fe;
+      border-left: 4px solid #2563eb;
+      padding: 12px 18px;
+      margin: 24px 0;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Explication des pages principales de l'application Spotlight</h1>
+
+    <div class="section">
+      <h2>1. Page de Login (<span class="file">app/(auth)/login.tsx</span>)</h2>
+      <p>
+        Cette page permet à l'utilisateur de se connecter via Google grâce à Clerk. Elle comprend :
+      </p>
+      <ul>
+        <li>Un logo et le nom de l'application</li>
+        <li>Un slogan "don't miss anything"</li>
+        <li>Une illustration centrale</li>
+        <li>Un bouton <b>Continue with Google</b> qui déclenche l'authentification OAuth</li>
+        <li>Un texte d'information sur les conditions d'utilisation</li>
+      </ul>
+      <pre><code>{/*
+- Utilise useOAuth de Clerk pour la connexion Google
+- Redirige l'utilisateur vers /(tabs) après connexion
+- Utilise des styles personnalisés (auth.style.ts)
+*/}</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>2. Layout d'authentification (<span class="file">app/(auth)/_layout.tsx</span>)</h2>
+      <p>
+        Ce layout gère l'affichage des pages d'authentification et le chargement de la police personnalisée. Il masque le header et applique un fond noir.
+      </p>
+      <pre><code>{/*
+- Charge la police JetBrainsMono-Medium
+- Utilise Stack de expo-router pour la navigation
+- Masque le header
+*/}</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>3. Layout principal et protection des routes (<span class="file">app/_layout.tsx</span> & <span class="file">components/InitialLauyot.tsx</span>)</h2>
+      <p>
+        Le layout principal englobe toute l'application et applique la logique de protection des routes :
+      </p>
+      <ul>
+        <li>Si l'utilisateur n'est pas connecté, il est redirigé vers <b>/(auth)/login</b></li>
+        <li>Si l'utilisateur est connecté, il est redirigé vers <b>/(tabs)</b></li>
+        <li>Utilise ClerkProvider pour fournir le contexte d'authentification</li>
+      </ul>
+      <pre><code>{/*
+- useAuth pour vérifier l'état de connexion
+- useSegments et useRouter pour la navigation conditionnelle
+- Stack pour la navigation principale
+*/}</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>4. Page de Tabs (<span class="file">app/(tabs)/_layout.tsx</span>)</h2>
+      <p>
+        Cette page définit la navigation par onglets (Tabs) en bas de l'application. Chaque onglet correspond à une section (Accueil, Bookmarks, Création, Notifications, Profil).
+      </p>
+      <ul>
+        <li>Personnalisation des icônes et couleurs</li>
+        <li>Masquage du label des onglets</li>
+        <li>Style sombre et moderne</li>
+      </ul>
+      <pre><code>{/*
+- Utilise Tabs et Tabs.Screen de expo-router
+- Icônes Ionicons pour chaque onglet
+- Style défini dans tabBarStyle
+*/}</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>5. Styles personnalisés (<span class="file">styles/auth.style.ts</span>)</h2>
+      <p>
+        Ce fichier centralise tous les styles utilisés pour la page de login et d'autres composants d'authentification.
+      </p>
+      <ul>
+        <li>Couleurs, polices, marges, paddings, ombres</li>
+        <li>Styles pour le bouton Google, l'illustration, le texte, etc.</li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <b>Remarque :</b> L'application utilise <b>Clerk</b> pour l'authentification sécurisée, <b>expo-router</b> pour la navigation, et applique une séparation claire entre les pages publiques (auth) et privées (tabs).
+    </div>
+  </div>
+</body>
+</html>
