@@ -1,8 +1,7 @@
 # 🌟 Spotlight - Social Media App
 
 <div align="center">
-  <img src="spotlight-logo.png" alt="Spotlight Logo" width="100"/>
-  <h3>Don't miss anything</h3>
+  <img src="spotlight-logo.png" alt="Spotlight Logo" width="200"/>
 </div>
 
 ## 📱 Overview
